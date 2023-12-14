@@ -1,5 +1,6 @@
 package com.generation.lojagames.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +40,16 @@ public class ProdutoController {
 		return ResponseEntity.ok(produtoRepository.findAll());
 
 	}
+	
+	@GetMapping("/maior/{valor}")
+	public ResponseEntity<List<Produto>> getAllGreater(@PathVariable BigDecimal valor){
+		return ResponseEntity.ok(produtoRepository.findAllByValorGreaterThan(valor));
+	}
+	
+	@GetMapping("/menor/{valor}")
+	public ResponseEntity<List<Produto>> getAllLess(@PathVariable BigDecimal valor){
+		return ResponseEntity.ok(produtoRepository.findAllByValorLessThan(valor));
+	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<Produto> getById(@PathVariable Long id) {
@@ -56,19 +67,19 @@ public class ProdutoController {
 
 		if (categoriaRepository.existsById(produto.getCategoria().getId()))
 			return ResponseEntity.status(HttpStatus.CREATED).body(produtoRepository.save(produto));
-		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "categoria não encontrada");
+		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria não existe");
 
 	}
 
 	@PutMapping
 	public ResponseEntity<Produto> put(@Valid @RequestBody Produto produto) {
 
-		if (categoriaRepository.existsById(produto.getCategoria().getId()))
-			return produtoRepository.findById(produto.getId())
+		if (produtoRepository.existsById(produto.getId()))
+			return categoriaRepository.findById(produto.getCategoria().getId())
 					.map(resp -> ResponseEntity.status(HttpStatus.OK).body(produtoRepository.save(produto)))
-					.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+					.orElse(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
 
-		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "categoria não encontrada", null);
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não encontrada", null);
 
 	}
 

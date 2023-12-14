@@ -18,17 +18,21 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.generation.lojagames.model.Produto;
+import com.generation.lojagames.repository.CategoriaRepository;
 import com.generation.lojagames.repository.ProdutoRepository;
 
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping
+@RequestMapping("/produtos")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ProdutoController {
 
 	@Autowired
 	private ProdutoRepository produtoRepository;
+
+	@Autowired
+	private CategoriaRepository categoriaRepository;
 
 	@GetMapping
 	public ResponseEntity<List<Produto>> getAll() {
@@ -41,32 +45,39 @@ public class ProdutoController {
 		return produtoRepository.findById(id).map(produto -> ResponseEntity.ok(produto))
 				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
-	
+
 	@GetMapping("/nome/{nome}")
-	public ResponseEntity<List<Produto>> getByNome(@PathVariable String nome){
+	public ResponseEntity<List<Produto>> getByNome(@PathVariable String nome) {
 		return ResponseEntity.ok(produtoRepository.findAllByNomeContainingIgnoreCase(nome));
 	}
-	
+
 	@PostMapping
-	public ResponseEntity<Produto> post(@Valid @RequestBody Produto produto){
-		return ResponseEntity.status(HttpStatus.CREATED).body(produtoRepository.save(produto));
+	public ResponseEntity<Produto> post(@Valid @RequestBody Produto produto) {
+
+		if (categoriaRepository.existsById(produto.getCategoria().getId()))
+			return ResponseEntity.status(HttpStatus.CREATED).body(produtoRepository.save(produto));
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "categoria não encontrada");
+
 	}
-	
+
 	@PutMapping
-	public ResponseEntity<Produto> put(@Valid @RequestBody Produto produto){
-		if(produtoRepository.existsById(produto.getId()))
-			return ResponseEntity.status(HttpStatus.OK).body(produtoRepository.save(produto));
-		else
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-		
+	public ResponseEntity<Produto> put(@Valid @RequestBody Produto produto) {
+
+		if (categoriaRepository.existsById(produto.getCategoria().getId()))
+			return produtoRepository.findById(produto.getId())
+					.map(resp -> ResponseEntity.status(HttpStatus.OK).body(produtoRepository.save(produto)))
+					.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "categoria não encontrada", null);
+
 	}
-	
+
 	@DeleteMapping("/{id}")
 	public void deleteById(@PathVariable Long id) {
 		Optional<Produto> checagem = produtoRepository.findById(id);
-		if(checagem.isEmpty())
+		if (checagem.isEmpty())
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-		
+
 		produtoRepository.deleteById(id);
 	}
 

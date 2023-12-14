@@ -40,20 +40,20 @@ public class ProdutoController {
 		return ResponseEntity.ok(produtoRepository.findAll());
 
 	}
-	
+
 	@GetMapping("/maior/{valor}")
-	public ResponseEntity<List<Produto>> getAllGreater(@PathVariable BigDecimal valor){
+	public ResponseEntity<List<Produto>> getAllGreater(@PathVariable BigDecimal valor) {
 		return ResponseEntity.ok(produtoRepository.findAllByValorGreaterThan(valor));
 	}
-	
+
 	@GetMapping("/menor/{valor}")
-	public ResponseEntity<List<Produto>> getAllLess(@PathVariable BigDecimal valor){
+	public ResponseEntity<List<Produto>> getAllLess(@PathVariable BigDecimal valor) {
 		return ResponseEntity.ok(produtoRepository.findAllByValorLessThan(valor));
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<Produto> getById(@PathVariable Long id) {
-		return produtoRepository.findById(id).map(produto -> ResponseEntity.ok(produto))
+		return produtoRepository.findById(id).map(resp -> ResponseEntity.ok(resp))
 				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 
@@ -85,8 +85,8 @@ public class ProdutoController {
 
 	@DeleteMapping("/{id}")
 	public void deleteById(@PathVariable Long id) {
-		Optional<Produto> checagem = produtoRepository.findById(id);
-		if (checagem.isEmpty())
+		Optional<Produto> resp = produtoRepository.findById(id);
+		if (resp.isEmpty())
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 
 		produtoRepository.deleteById(id);

@@ -38,7 +38,7 @@ public class Produto {
 	@Digits(integer = 3, fraction = 2)
 	private BigDecimal valor;
 
-	@Column(nullable = false)
+	@Column(length = 1000)
 	@Size(max = 1000, message = "O link da imagem deve conter até 1000 caracteres")
 	private String imagem;
 

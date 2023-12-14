@@ -37,7 +37,7 @@ public class CategoriaController {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<Categoria> getById(@PathVariable Long id) {
-		return categoriaRepository.findById(id).map(pesquisa -> ResponseEntity.ok(pesquisa))
+		return categoriaRepository.findById(id).map(resp -> ResponseEntity.ok(resp))
 				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 
@@ -62,9 +62,9 @@ public class CategoriaController {
 	@DeleteMapping("/{id}")
 	public void deleteById(@PathVariable Long id) {
 
-		Optional<Categoria> checagem = categoriaRepository.findById(id);
+		Optional<Categoria> resp = categoriaRepository.findById(id);
 
-		if (checagem.isEmpty())
+		if (resp.isEmpty())
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 
 		categoriaRepository.deleteById(id);

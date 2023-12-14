@@ -8,10 +8,12 @@ import org.springframework.data.repository.query.Param;
 
 import com.generation.lojagames.model.Produto;
 
-public interface ProdutoRepository extends JpaRepository<Produto, Long>{
-	
-	List<Produto> findAllByNomeContainingIgnoreCase(@Param("nome")String nome);
+public interface ProdutoRepository extends JpaRepository<Produto, Long> {
+
+	List<Produto> findAllByNomeContainingIgnoreCase(@Param("nome") String nome);
+
 	List<Produto> findAllByValorGreaterThan(BigDecimal valor);
+
 	List<Produto> findAllByValorLessThan(BigDecimal valor);
-	
+
 }
